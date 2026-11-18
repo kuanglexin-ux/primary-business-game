@@ -13,7 +13,10 @@
      拖动不触发点开答疑，免得挡住“下一步”按键。
      ⑧ 2026-11-18 改：结算时库存贬值为 0——净资产 = 手里的现金 − 还欠银行的钱，不再
      算库存衣服的成本价值（与正式 DBS 系统一致）；结算页 hint、没卖完提示与 Ricky
-     “净资产是什么？”词条同步改，词条里加小字提醒“要尽量把衣服卖完”。 -->
+     “净资产是什么？”词条同步改，词条里加小字提醒“要尽量把衣服卖完”。
+     ⑨ 2026-11-18 修：手机上结算表（9 列）与最终排名表会冲出页面——两张表包进
+     横向滚动容器（.table-scroll），表给最小宽度、单元格不换行，手机上左右滑着看，
+     页面本身不再横向溢出。 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -76,6 +79,11 @@
   .alert.green{background:#e9f7ee;border:1px solid #a8d9b8;color:#145c2e}
   .alert.amber{background:#fff7e0;border:1px solid #f0d48a;color:#6d5200}
   table{width:100%;border-collapse:collapse;font-size:14.5px;margin-top:10px}
+  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:10px}
+  .table-scroll table{margin-top:0}
+  #res-table,#final-rank{min-width:620px}
+  #res-table th,#res-table td,#final-rank th,#final-rank td{white-space:nowrap;padding:8px 8px}
+  @media (max-width:480px){ #res-table,#final-rank{font-size:13px} }
   td,th{padding:8px 4px;border-bottom:1px dashed var(--line)}
   td:last-child,th:last-child{text-align:right;font-weight:700;white-space:nowrap}
   td.neg{color:var(--red)}
@@ -293,8 +301,8 @@
   <div id="results" style="display:none">
     <div class="card active" style="display:block">
       <h2>📊 第 <span class="res-round"></span> 轮结算</h2>
-      <p class="hint">排名按净资产算：净资产 = 手里的现金 − 还欠银行的钱。没卖掉的衣服最终结算时会贬值为 0。</p>
-      <table id="res-table"></table>
+      <p class="hint">排名按净资产算：净资产 = 手里的现金 − 还欠银行的钱。没卖掉的衣服结算时会贬值为 0。</p>
+      <div class="table-scroll"><table id="res-table"></table></div>
       <div id="res-tips"></div>
       <div id="res-spy"></div>
       <br>
@@ -311,7 +319,7 @@
         <div class="big">🏆</div>
         <h2>比赛结束！最终排名</h2>
         <p>1 轮打完，借的钱已经还清了（本金 + 利息）。最后按净资产排名：</p>
-        <table id="final-rank"></table>
+        <div class="table-scroll"><table id="final-rank"></table></div>
         <br>
         <button class="btn-go" onclick="location.reload()">🔄 再玩一次</button>
       </div>
@@ -744,7 +752,7 @@ function nextRound(){
 
 /* ---------- Ricky 答疑：灯泡态 → 词条态 → 解析态，点空白逐级返回 ---------- */
 const RICKY_GENERAL = [
- {q:"净资产是什么？", a:"净资产 = 手里的现金 − 欠银行的钱。<small>小提醒：没卖掉的衣服最终结算时会贬值为 0，要尽量把衣服卖完！</small>"}, 
+ {q:"净资产是什么？", a:"净资产 = 手里的现金 − 欠银行的钱。<small>小提醒：没卖掉的衣服会贬值为 0，要尽量把衣服卖完！</small>"}, 
 {q:"这一局怎么玩？", a:"你要对战 4 位电脑玩家，只打 1 轮。跟着 8 个步骤填好你的决策，点提交，系统就会算出谁卖得多、谁赚得多。最后按净资产排名。"},
   {q:"竞争力是什么？", a:"同一个城市里，竞争力高的店铺越多客人来买，更容易卖完。店铺的竞争力看这三个地方：衣服质量高低、卖多少广告、定价会不会太贵。"},
   {q:"借的钱什么时候还？", a:"借的钱在最后结算收益前还给银行，本金加利息一起还。利息就是借钱的成本，每轮都要算一次。"}
